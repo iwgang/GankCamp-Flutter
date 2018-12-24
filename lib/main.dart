@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -7,57 +9,51 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '干货集中营',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('干货'),
+        ),
+        body: Center(
+          child: RollingButton(),
+        ),
       ),
-      home: MyHomePage(title: 'Gank集中营'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
+class RollingButton extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State createState() => _RollingState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _RollingState extends State<RollingButton> {
+  final _random = Random();
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  List<int> _roll() {
+    final roll1 = _random.nextInt(6) + 1;
+    final roll2 = _random.nextInt(6) + 1;
+    return [roll1, roll2];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              '计时器:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
+    return RaisedButton(
+      child: Text('点我试试'),
+      onPressed: _onPressed,
+    );
+  }
+
+  void _onPressed() {
+    print('点我干啥阿...$context');
+    final rollResult = _roll();
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text('我是标题吖'),
+          content: Text('点我干啥吖...${rollResult[0]} _ ${rollResult[1]}'),
+        );
+      },
     );
   }
 }
