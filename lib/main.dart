@@ -1,6 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'pages/maintab/main_tab_gank.dart';
+import 'pages/maintab/main_tab_rec.dart';
+import 'pages/maintab/main_tab_girl.dart';
+import 'pages/maintab/main_tab_me.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,51 +12,70 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '干货集中营',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('干货'),
-        ),
-        body: Center(
-          child: RollingButton(),
-        ),
-      ),
+      home: _RootWidget(),
     );
   }
 }
 
-class RollingButton extends StatefulWidget {
-  @override
-  State createState() => _RollingState();
-}
-
-class _RollingState extends State<RollingButton> {
-  final _random = Random();
-
-  List<int> _roll() {
-    final roll1 = _random.nextInt(6) + 1;
-    final roll2 = _random.nextInt(6) + 1;
-    return [roll1, roll2];
-  }
-
+class _RootWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-      child: Text('点我试试'),
-      onPressed: _onPressed,
-    );
-  }
-
-  void _onPressed() {
-    print('点我干啥阿...$context');
-    final rollResult = _roll();
-    showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: Text('我是标题吖'),
-          content: Text('点我干啥吖...${rollResult[0]} _ ${rollResult[1]}'),
-        );
-      },
+    return WillPopScope(
+      onWillPop: () => Future<bool>.value(true),
+      child: DefaultTextStyle(
+        style: TextStyle(
+          color: CupertinoColors.black,
+          fontSize: 17,
+        ),
+        child: CupertinoTabScaffold(
+          tabBar: CupertinoTabBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.home),
+                title: Text('干货'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.conversation_bubble),
+                title: Text('推荐'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.shuffle_thick),
+                title: Text('妹纸'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(CupertinoIcons.profile_circled),
+                title: Text('我的'),
+              ),
+            ],
+            backgroundColor: Color(0xFF00eeff),
+          ),
+          tabBuilder: (BuildContext context, int index) {
+            switch (index) {
+              case 0:
+                return CupertinoTabView(
+                  builder: (BuildContext context) => MainTabGank(),
+                );
+                break;
+              case 1:
+                return CupertinoTabView(
+                  builder: (BuildContext context) => MainTabRec(),
+                );
+                break;
+              case 2:
+                return CupertinoTabView(
+                  builder: (BuildContext context) => MainTabGirl(),
+                );
+                break;
+              case 3:
+                return CupertinoTabView(
+                  builder: (BuildContext context) => MainTabMe(),
+                );
+                break;
+            }
+            return null;
+          },
+        ),
+      ),
     );
   }
 }
