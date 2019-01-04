@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gankcamp_flutter/pages/widget/gank_list_widget.dart';
 
 const _allTabs = <String>[
   'Android',
@@ -58,7 +59,7 @@ class _MainTabGankState extends State<MainTabGank>
       controller: _controller,
       isScrollable: true,
       indicator: UnderlineTabIndicator(
-          borderSide: BorderSide(color: Colors.black, width: 3)),
+          borderSide: BorderSide(color: Colors.white, width: 3)),
       tabs: _allTabs.map<Tab>((tab) => Tab(text: tab)).toList(),
     );
   }
@@ -66,13 +67,7 @@ class _MainTabGankState extends State<MainTabGank>
   Widget bodyWidget() {
     return TabBarView(
       controller: _controller,
-      children: _allTabs
-          .map<Widget>((tab) => Container(
-                child: Center(
-                  child: Text(tab),
-                ),
-              ))
-          .toList(),
+      children: _allTabs.map<Widget>((tab) => GankListWidget(tab)).toList(),
     );
   }
 }

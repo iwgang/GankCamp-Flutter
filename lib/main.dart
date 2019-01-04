@@ -29,6 +29,7 @@ class _RootWidget extends StatelessWidget {
         ),
         child: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
+            activeColor: Colors.green,
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.home),

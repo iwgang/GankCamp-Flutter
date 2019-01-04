@@ -12,8 +12,19 @@ class MainTabRec extends StatelessWidget {
             backgroundColor: Colors.green,
             expandedHeight: _appBarHeight,
             pinned: true,
+            actions: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.date_range),
+                tooltip: '切换日期',
+                onPressed: () => print('edit...'),
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
-              title: Text('每日推荐'),
+              centerTitle: true,
+              title: Text(
+                '推荐：2019-01-04',
+                style: TextStyle(fontSize: 17),
+              ),
               background: Image.network(
                 "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1546509702760&di=e77e8c31e2241c14894278d53df7230a&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01a52958009e2ea84a0e282bd0d86c.jpg%402o.jpg",
                 fit: BoxFit.cover,
