@@ -10,23 +10,27 @@ class GankListWidget extends StatefulWidget {
   GankListWidget(this.type);
 
   @override
-  State createState() {
-    return _GankListWidgetState(
-        listener: (position) => print('ItemView click >> $position'),
-        type: type);
-  }
+  State createState() => _GankListWidgetState(
+      listener: (position) => print('ItemView click >> $position'), type: type);
 }
 
 class _GankListWidgetState extends State<GankListWidget> {
   final String type;
   final OnItemClickListener listener;
-  var gankInfoList = <GankInfo>[];
+  final gankInfoList = <GankInfo>[];
 
   _GankListWidgetState({@required this.type, this.listener}) {
-    gankList(1);
+    print('构造... type = $type');
+    _gankList(1);
   }
 
-  void gankList(int pageNo) async {
+  @override
+  void initState() {
+    super.initState();
+    print('initState... type = $type');
+  }
+
+  void _gankList(int pageNo) async {
     List<GankInfo> res = await gankApi.gankList(type, pageNo, 20);
     if (null != res && res.isNotEmpty) {
       setState(() {
