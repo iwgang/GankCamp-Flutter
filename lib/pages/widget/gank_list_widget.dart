@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gankcamp_flutter/http/gank_api_util.dart' as gankApi;
+import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
 
 typedef OnItemClickListener = void Function(int position);
@@ -10,32 +10,24 @@ class GankListWidget extends StatefulWidget {
   GankListWidget(this.type);
 
   @override
-  State createState() => _GankListWidgetState(
-      listener: (position) => print('ItemView click >> $position'), type: type);
+  State createState() => _GankListWidgetState();
 }
 
-class _GankListWidgetState extends State<GankListWidget> {
-  final String type;
-  final OnItemClickListener listener;
-  final gankInfoList = <GankInfo>[];
-
-  _GankListWidgetState({@required this.type, this.listener}) {
-    print('构造... type = $type');
-    _gankList(1);
-  }
+class _GankListWidgetState extends State<GankListWidget>
+    with AutomaticKeepAliveClientMixin {
+  List<GankInfo> gankInfoList;
 
   @override
   void initState() {
     super.initState();
-    print('initState... type = $type');
+    _gankList(1);
   }
 
   void _gankList(int pageNo) async {
-    List<GankInfo> res = await gankApi.gankList(type, pageNo, 20);
+    List<GankInfo> res = await GankApiManager.gankList(widget.type, pageNo, 20);
     if (null != res && res.isNotEmpty) {
       setState(() {
-        gankInfoList.clear();
-        gankInfoList.addAll(res);
+        gankInfoList = res;
       });
     }
   }
@@ -43,15 +35,16 @@ class _GankListWidgetState extends State<GankListWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      key: PageStorageKey<String>(type),
-      itemCount: gankInfoList.length,
+      itemCount: gankInfoList?.length ?? 0,
       itemBuilder: (context, index) => InkWell(
             child: _ItemView(index, gankInfoList[index]),
-            onTap: () =>
-                null != listener ? listener(index) : print('Null listener'),
+            onTap: () => print('All listener'),
           ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class _ItemView extends StatelessWidget {
