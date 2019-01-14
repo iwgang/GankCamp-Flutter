@@ -10,6 +10,7 @@ class GankApiManager {
 
   static Future<Map<String, dynamic>> get(String url) async {
     try {
+      print('>>> get url = $url');
       final response = await dio.get(url);
       if (response.statusCode == 200) {
         return response.data;

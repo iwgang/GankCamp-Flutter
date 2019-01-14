@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
+import "package:pull_to_refresh/pull_to_refresh.dart";
+import 'package:gankcamp_flutter/pages/widget/refresh_common_widget.dart';
 
 typedef OnItemClickListener = void Function(int position);
 
@@ -15,31 +17,67 @@ class GankListWidget extends StatefulWidget {
 
 class _GankListWidgetState extends State<GankListWidget>
     with AutomaticKeepAliveClientMixin {
-  List<GankInfo> gankInfoList;
+  List<GankInfo> _gankInfoList;
+  int _pageNo = 1;
+  RefreshController _refreshController;
 
   @override
   void initState() {
     super.initState();
-    _gankList(1);
+    _refreshController = RefreshController();
+    _gankList();
   }
 
-  void _gankList(int pageNo) async {
-    List<GankInfo> res = await GankApiManager.gankList(widget.type, pageNo, 20);
+  Future _gankList([VoidCallback loadEndCallback = ]) async {
+    print('加载 _pageNo = $_pageNo _____ $loadEndCallback');
+    List<GankInfo> res =
+        await GankApiManager.gankList(widget.type, _pageNo, 20);
+    if (null != loadEndCallback) loadEndCallback();
     if (null != res && res.isNotEmpty) {
-      setState(() {
-        gankInfoList = res;
-      });
+      if (_pageNo == 1) {
+        setState(() {
+          _gankInfoList = res;
+        });
+      } else {
+        setState(() {
+          _gankInfoList.addAll(res);
+        });
+      }
+    }
+  }
+
+  Future _onListViewLoadData(bool up) async {
+    if (up) {
+      // 下拉刷新
+      _pageNo = 1;
+      await _gankList(
+          () => _refreshController.sendBack(true, RefreshStatus.completed));
+    } else {
+      // 加载更多
+      _pageNo++;
+      await _gankList(
+          () => _refreshController.sendBack(false, RefreshStatus.idle));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: gankInfoList?.length ?? 0,
-      itemBuilder: (context, index) => InkWell(
-            child: _ItemView(index, gankInfoList[index]),
-            onTap: () => print('All listener'),
-          ),
+    return Container(
+      color: Colors.white,
+      child: SmartRefresher(
+        enablePullUp: true,
+        controller: _refreshController,
+        onRefresh: _onListViewLoadData,
+        headerBuilder: RefreshCommonWidget.commonHeaderBuilder,
+        footerBuilder: RefreshCommonWidget.commonFooterBuilder,
+        child: ListView.builder(
+          itemCount: _gankInfoList?.length ?? 0,
+          itemBuilder: (context, index) => InkWell(
+                child: _ItemView(index, _gankInfoList[index]),
+                onTap: () => print('All listener'),
+              ),
+        ),
+      ),
     );
   }
 

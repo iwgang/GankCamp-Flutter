@@ -21,6 +21,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   json_annotation: ^2.0.0
   dio: ^1.0.13
+  pull_to_refresh: ^1.1.6
 
 dev_dependencies:
   flutter_test:
