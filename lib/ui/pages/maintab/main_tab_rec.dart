@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
 
-class MainTabRec extends StatelessWidget {
+class MainTabRecWidget extends StatefulWidget {
+  @override
+  State createState() => _MainTabState();
+}
+
+class _MainTabState extends State<MainTabRecWidget>
+    with AutomaticKeepAliveClientMixin {
   final double _appBarHeight = 200;
 
   @override
@@ -51,4 +57,7 @@ class MainTabRec extends StatelessWidget {
     }
     return retList;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

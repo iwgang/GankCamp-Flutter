@@ -4,12 +4,12 @@ import 'package:gankcamp_flutter/constant/app_colors.dart';
 
 const _allTabs = <String>['全部', 'Android', 'iOS', '前端', '瞎推荐', '休息视频', '拓展资源'];
 
-class MainTabGank extends StatefulWidget {
+class MainTabGankWidget extends StatefulWidget {
   @override
-  State createState() => _MainTabGankState();
+  State createState() => _MainTabGankWidgetState();
 }
 
-class _MainTabGankState extends State<MainTabGank> {
+class _MainTabGankWidgetState extends State<MainTabGankWidget> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -33,4 +33,7 @@ class _MainTabGankState extends State<MainTabGank> {
           ),
         ));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
