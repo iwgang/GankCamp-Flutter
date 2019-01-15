@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/pages/widget/gank_list_widget.dart';
+import 'package:gankcamp_flutter/constant/app_colors.dart';
 
-const _allTabs = <String>[
-  'Android',
-  'iOS',
-  '前端',
-  '拓展资源',
-  '休息视频',
-  '休息视频3',
-  '休息视频5',
-];
+const _allTabs = <String>['全部', 'Android', 'iOS', '前端', '瞎推荐', '休息视频', '拓展资源'];
 
 class MainTabGank extends StatefulWidget {
   @override
@@ -23,7 +16,7 @@ class _MainTabGankState extends State<MainTabGank> {
         length: _allTabs.length,
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.MAIN_COLOR,
             title: Text('干货'),
             elevation: 0,
             bottom: TabBar(
@@ -34,8 +27,9 @@ class _MainTabGankState extends State<MainTabGank> {
             ),
           ),
           body: TabBarView(
-            children:
-                _allTabs.map<Widget>((tab) => GankListWidget(tab)).toList(),
+            children: _allTabs
+                .map<Widget>((tab) => GankListWidget(tab == '全部' ? 'all' : tab))
+                .toList(),
           ),
         ));
   }

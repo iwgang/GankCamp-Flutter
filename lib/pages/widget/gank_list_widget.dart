@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
-import "package:pull_to_refresh/pull_to_refresh.dart";
 import 'package:gankcamp_flutter/pages/widget/refresh_common_widget.dart';
-
-typedef OnItemClickListener = void Function(int position);
+import 'package:gankcamp_flutter/constant/common_utils.dart';
+import 'package:gankcamp_flutter/constant/app_colors.dart';
+import "package:pull_to_refresh/pull_to_refresh.dart";
+import 'package:gankcamp_flutter/pages/webview_page.dart';
 
 class GankListWidget extends StatefulWidget {
   final String type;
@@ -20,18 +22,22 @@ class _GankListWidgetState extends State<GankListWidget>
   List<GankInfo> _gankInfoList;
   int _pageNo = 1;
   RefreshController _refreshController;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _refreshController = RefreshController();
-    _gankList();
+    _gankList(() {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
-  Future _gankList([VoidCallback loadEndCallback = ]) async {
-    print('加载 _pageNo = $_pageNo _____ $loadEndCallback');
+  Future _gankList([VoidCallback loadEndCallback]) async {
     List<GankInfo> res =
-        await GankApiManager.gankList(widget.type, _pageNo, 20);
+        await GankApiManager.gankList(widget.type, _pageNo, 10);
     if (null != loadEndCallback) loadEndCallback();
     if (null != res && res.isNotEmpty) {
       if (_pageNo == 1) {
@@ -62,22 +68,41 @@ class _GankListWidgetState extends State<GankListWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: SmartRefresher(
-        enablePullUp: true,
-        controller: _refreshController,
-        onRefresh: _onListViewLoadData,
-        headerBuilder: RefreshCommonWidget.commonHeaderBuilder,
-        footerBuilder: RefreshCommonWidget.commonFooterBuilder,
-        child: ListView.builder(
-          itemCount: _gankInfoList?.length ?? 0,
-          itemBuilder: (context, index) => InkWell(
-                child: _ItemView(index, _gankInfoList[index]),
-                onTap: () => print('All listener'),
-              ),
+    return Stack(
+      children: <Widget>[
+        Offstage(
+          offstage: _isLoading,
+          child: SmartRefresher(
+            enablePullUp: true,
+            controller: _refreshController,
+            onRefresh: _onListViewLoadData,
+            headerBuilder: RefreshCommonWidget.commonHeaderBuilder,
+            footerBuilder: RefreshCommonWidget.commonFooterBuilder,
+            child: ListView.builder(
+              itemCount: _gankInfoList?.length ?? 0,
+              itemBuilder: (context, index) => InkWell(
+                    child: _ItemView(index, _gankInfoList[index]),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) {
+                          return WebViewPage(_gankInfoList[index]);
+                        }),
+                      );
+                    },
+                  ),
+            ),
+          ),
         ),
-      ),
+        Offstage(
+          offstage: !_isLoading,
+          child: Center(
+            child: SpinKitThreeBounce(
+              color: AppColors.MAIN_COLOR,
+              size: 30.0,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -93,22 +118,45 @@ class _ItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(25),
-          child: Icon(Icons.restaurant, color: Colors.blue),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(gankInfo.desc),
-              Text(gankInfo.who),
-            ],
+    return Container(
+        padding: EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              width: 0.0,
+              color: Color(0xffe5e5e5),
+            ),
           ),
-        )
-      ],
-    );
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              gankInfo.desc,
+              style: TextStyle(color: Colors.black, fontSize: 16),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 8),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      'via：${gankInfo.who}',
+                      style: TextStyle(
+                        color: Color(0xff999999),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    CommonUtils.formatTime(gankInfo.publishedAt),
+                    style: TextStyle(
+                      color: Color(0xff999999),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 }

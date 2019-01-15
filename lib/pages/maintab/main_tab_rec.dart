@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gankcamp_flutter/constant/app_colors.dart';
 
 class MainTabRec extends StatelessWidget {
   final double _appBarHeight = 200;
@@ -9,7 +10,7 @@ class MainTabRec extends StatelessWidget {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.MAIN_COLOR,
             expandedHeight: _appBarHeight,
             pinned: true,
             actions: <Widget>[
