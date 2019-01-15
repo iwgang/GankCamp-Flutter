@@ -21,7 +21,7 @@ class _RootWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => Future<bool>.value(false),
+      onWillPop: () => Future<bool>.value(true),
       child: DefaultTextStyle(
         style: TextStyle(
           color: CupertinoColors.black,
