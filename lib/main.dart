@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'pages/maintab/main_tab_gank.dart';
-import 'pages/maintab/main_tab_rec.dart';
-import 'pages/maintab/main_tab_girl.dart';
-import 'pages/maintab/main_tab_me.dart';
+import 'ui/pages/maintab/main_tab_gank.dart';
+import 'ui/pages/maintab/main_tab_rec.dart';
+import 'ui/pages/maintab/main_tab_girl.dart';
+import 'ui/pages/maintab/main_tab_me.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,7 +21,7 @@ class _RootWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () => Future<bool>.value(true),
+      onWillPop: () => Future<bool>.value(false),
       child: DefaultTextStyle(
         style: TextStyle(
           color: CupertinoColors.black,

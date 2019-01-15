@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gankcamp_flutter/pages/widget/gank_list_widget.dart';
+import 'package:gankcamp_flutter/ui/widget/gank_list_widget.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
 
 const _allTabs = <String>['全部', 'Android', 'iOS', '前端', '瞎推荐', '休息视频', '拓展资源'];

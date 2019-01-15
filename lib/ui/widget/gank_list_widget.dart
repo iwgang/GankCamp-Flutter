@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
-import 'package:gankcamp_flutter/pages/widget/refresh_common_widget.dart';
+import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
 import 'package:gankcamp_flutter/constant/common_utils.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
 import "package:pull_to_refresh/pull_to_refresh.dart";
-import 'package:gankcamp_flutter/pages/webview_page.dart';
+import 'package:gankcamp_flutter/ui/pages/webview_page.dart';
 
 class GankListWidget extends StatefulWidget {
   final String type;
