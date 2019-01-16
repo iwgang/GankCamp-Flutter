@@ -72,7 +72,7 @@ class _RootState extends State<_RootWidget>
         children: <Widget>[
           MainTabGankWidget(),
           MainTabRecWidget(),
-          MainTabGirl(),
+          MainTabGirlWidget(),
           MainTabMe(),
         ],
       ),

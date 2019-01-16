@@ -81,12 +81,13 @@ class _GankListWidgetState extends State<GankListWidget>
             child: ListView.builder(
               itemCount: _gankInfoList?.length ?? 0,
               itemBuilder: (context, index) => InkWell(
-                    child: _ItemView(index, _gankInfoList[index]),
+                    child: _ItemView(_gankInfoList[index]),
                     onTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) {
-                          return WebViewPage(_gankInfoList[index]);
-                        }),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              WebViewPage(_gankInfoList[index]),
+                        ),
                       );
                     },
                   ),
@@ -111,10 +112,9 @@ class _GankListWidgetState extends State<GankListWidget>
 }
 
 class _ItemView extends StatelessWidget {
-  final int pos;
   final GankInfo gankInfo;
 
-  _ItemView(this.pos, this.gankInfo);
+  _ItemView(this.gankInfo);
 
   @override
   Widget build(BuildContext context) {
