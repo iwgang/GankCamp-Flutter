@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
 
 import 'response/gank_list_res.dart';
+import 'response/recommend_day_list_res.dart';
+import 'response/recommend_day_res.dart';
 
 class GankApiManager {
   static Dio dio = Dio();
@@ -29,6 +31,23 @@ class GankApiManager {
       var gankListRes = GankListRes.fromJson(res);
       if (null != gankListRes && !gankListRes.error) {
         return gankListRes.results;
+      }
+    }
+    return null;
+  }
+
+  static Future<RecommendDayRes> recommendDay(String date) async {
+    Map<String, dynamic> res = await get('${_BASE_URL}day/$date');
+    if (null != res) return RecommendDayRes.fromJson(res);
+    return null;
+  }
+
+  static Future<List<String>> recommendDayList() async {
+    Map<String, dynamic> oriRes = await get('${_BASE_URL}day/history');
+    if (null != oriRes) {
+      var res = RecommendDayListRes.fromJson(oriRes);
+      if (null != res && !res.error) {
+        return res.results;
       }
     }
     return null;

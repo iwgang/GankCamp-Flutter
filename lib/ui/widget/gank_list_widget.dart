@@ -119,44 +119,45 @@ class _ItemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 0.0,
-              color: Color(0xffe5e5e5),
-            ),
+      padding: EdgeInsets.only(top: 12, bottom: 12, left: 15, right: 15),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 0.0,
+            color: Color(0xffe5e5e5),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              gankInfo.desc,
-              style: TextStyle(color: Colors.black, fontSize: 16),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 8),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      'via：${gankInfo.who}',
-                      style: TextStyle(
-                        color: Color(0xff999999),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    CommonUtils.formatTime(gankInfo.publishedAt),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            gankInfo.desc,
+            style: TextStyle(color: Colors.black, fontSize: 16),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 8),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    'via：${gankInfo.who}',
                     style: TextStyle(
                       color: Color(0xff999999),
                     ),
                   ),
-                ],
-              ),
+                ),
+                Text(
+                  CommonUtils.formatTime(gankInfo.publishedAt),
+                  style: TextStyle(
+                    color: Color(0xff999999),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }

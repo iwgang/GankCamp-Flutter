@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:gankcamp_flutter/constant/app_colors.dart';
 
 class WebViewPage extends StatefulWidget {
   final GankInfo gankInfo;
@@ -22,6 +23,8 @@ class _WebViewPageState extends State<WebViewPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.gankInfo.desc),
+        backgroundColor: AppColors.MAIN_COLOR,
+        elevation: 2,
       ),
       body: WebView(
         javascriptMode: JavascriptMode.unrestricted,

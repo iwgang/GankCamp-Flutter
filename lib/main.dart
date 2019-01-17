@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import 'ui/pages/maintab/main_tab_gank.dart';
-import 'ui/pages/maintab/main_tab_rec.dart';
 import 'ui/pages/maintab/main_tab_girl.dart';
 import 'ui/pages/maintab/main_tab_me.dart';
+import 'ui/pages/maintab/main_tab_rec.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,17 +36,18 @@ class _RootState extends State<_RootWidget>
 
   BottomNavigationBar _bottomNavigationBar() {
     return BottomNavigationBar(
+      fixedColor: Colors.green,
       items: [
         BottomNavigationBarItem(
           icon: Icon(CupertinoIcons.home),
           title: Text('干货'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.conversation_bubble),
+          icon: Icon(CupertinoIcons.share),
           title: Text('推荐'),
         ),
         BottomNavigationBarItem(
-          icon: Icon(CupertinoIcons.shuffle_thick),
+          icon: Icon(CupertinoIcons.person),
           title: Text('妹纸'),
         ),
         BottomNavigationBarItem(

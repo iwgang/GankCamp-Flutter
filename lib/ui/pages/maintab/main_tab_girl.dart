@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gankcamp_flutter/model/gank_info.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
-import "package:pull_to_refresh/pull_to_refresh.dart";
-import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
+import 'package:gankcamp_flutter/http/gank_api_manager.dart';
+import 'package:gankcamp_flutter/model/gank_info.dart';
 import 'package:gankcamp_flutter/ui/pages/show_picture_page.dart';
+import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
+import "package:pull_to_refresh/pull_to_refresh.dart";
 import 'package:cached_network_image/cached_network_image.dart';
 
 class MainTabGirlWidget extends StatefulWidget {
@@ -89,17 +89,7 @@ class _MainTabGirlState extends State<MainTabGirlWidget>
                     (orientation == Orientation.portrait) ? 0.8 : 0.9,
                 children: null != _gankInfoList
                     ? _gankInfoList
-                        .map<Widget>((info) => InkWell(
-                              child: _ItemView(info),
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ShowPicturePage(info.url),
-                                  ),
-                                );
-                              },
-                            ))
+                        .map<Widget>((info) => _ItemView(info))
                         .toList()
                     : <Widget>[],
               ),
@@ -130,25 +120,48 @@ class _ItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridTile(
-      footer: Container(
-        color: Color(0x60000000),
-        padding: EdgeInsets.only(top: 5, bottom: 5, left: 10),
-        child: Text(
-          'via：${gankInfo.who}',
-          style: TextStyle(color: Colors.white, fontSize: 13),
-        ),
-      ),
-      child: Container(
-        color: Color(0xffe0e0e0),
-        child: CachedNetworkImage(
-          imageUrl: gankInfo.url,
-          placeholder: CircularProgressIndicator(
-            backgroundColor: AppColors.MAIN_COLOR,
+    return Stack(
+      children: <Widget>[
+        Positioned.fill(
+          child: GridTile(
+            footer: Container(
+              color: Color(0x60000000),
+              padding: EdgeInsets.only(top: 5, bottom: 5, left: 10),
+              child: Text(
+                'via：${gankInfo.who}',
+                style: TextStyle(color: Colors.white, fontSize: 13),
+              ),
+            ),
+            child: Container(
+              color: Color(0xffe0e0e0),
+              child: CachedNetworkImage(
+                imageUrl: gankInfo.url,
+                placeholder: Center(
+                  child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.MAIN_COLOR),
+                  ),
+                ),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          fit: BoxFit.cover,
         ),
-      ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ShowPicturePage(gankInfo.url),
+                  ),
+                );
+              },
+            ),
+          ),
+        )
+      ],
     );
   }
 }

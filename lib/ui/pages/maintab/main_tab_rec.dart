@@ -1,5 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
+import 'package:gankcamp_flutter/http/gank_api_manager.dart';
+import 'package:gankcamp_flutter/http/response/recommend_day_res.dart';
+import 'package:gankcamp_flutter/model/gank_info.dart';
+import 'package:gankcamp_flutter/ui/pages/webview_page.dart';
+import 'package:gankcamp_flutter/ui/widget/select_rec_date_widget.dart';
 
 class MainTabRecWidget extends StatefulWidget {
   @override
@@ -8,54 +15,204 @@ class MainTabRecWidget extends StatefulWidget {
 
 class _MainTabState extends State<MainTabRecWidget>
     with AutomaticKeepAliveClientMixin {
-  final double _appBarHeight = 200;
+  final double _appBarHeight = 280;
+  RecommendDayRes _recommendDayRes;
+  List<String> _canSelRecDateList;
+  String _bannerUrl;
+  bool _isLoading = true;
+  String _recDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _getRecDateList();
+  }
+
+  Future _getRecDateList() async {
+    List<String> res = await GankApiManager.recommendDayList();
+    if (null != res && res.isNotEmpty) {
+      _canSelRecDateList = res;
+      _recommendDay(_canSelRecDateList[0]);
+    }
+  }
+
+  Future _recommendDay(String date) async {
+    setState(() {
+      _recDate = date;
+    });
+    RecommendDayRes res =
+        await GankApiManager.recommendDay(date.replaceAll('-', '/'));
+    if (null != res) {
+      final welfareKey = '福利';
+      if (res.results.containsKey(welfareKey)) {
+        setState(() {
+          _bannerUrl = res.results[welfareKey][0].url;
+        });
+        res.results.remove(welfareKey);
+        res.category.remove(welfareKey);
+      }
+      setState(() {
+        _recommendDayRes = res;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            backgroundColor: AppColors.MAIN_COLOR,
-            expandedHeight: _appBarHeight,
-            pinned: true,
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.date_range),
-                tooltip: '切换日期',
-                onPressed: () => print('edit...'),
+    return Stack(
+      children: <Widget>[
+        Offstage(
+          offstage: _isLoading,
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                backgroundColor: AppColors.MAIN_COLOR,
+                expandedHeight: _appBarHeight,
+                pinned: true,
+                title: Text('推荐：$_recDate'),
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.date_range),
+                    tooltip: '切换日期',
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (_) => SelectRecDateWidget(_canSelRecDateList,
+                                (String date) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              _recommendDay(date.replaceAll('-', '/'));
+                            }),
+                      );
+                    },
+                  ),
+                ],
+                flexibleSpace: null == _bannerUrl
+                    ? null
+                    : FlexibleSpaceBar(
+                        background: CachedNetworkImage(
+                          imageUrl: _bannerUrl,
+                          fit: BoxFit.cover,
+                          height: _appBarHeight,
+                        ),
+                      ),
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate(bodyWidgets()),
               ),
             ],
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: true,
-              title: Text(
-                '推荐：2019-01-04',
-                style: TextStyle(fontSize: 17),
-              ),
-              background: Image.network(
-                "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1546509702760&di=e77e8c31e2241c14894278d53df7230a&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01a52958009e2ea84a0e282bd0d86c.jpg%402o.jpg",
-                fit: BoxFit.cover,
-                height: _appBarHeight,
+          ),
+        ),
+        Offstage(
+          offstage: !_isLoading,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('推荐'),
+              backgroundColor: AppColors.MAIN_COLOR,
+              elevation: 2,
+            ),
+            body: Center(
+              child: SpinKitThreeBounce(
+                color: AppColors.MAIN_COLOR,
+                size: 30.0,
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildListDelegate(genList()),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  List<Widget> genList() {
+  List<Widget> bodyWidgets() {
     var retList = <Widget>[];
-    for (var i = 0; i < 30; i++) {
-      retList.add(Text(
-        'i = $i',
-        style: TextStyle(fontSize: 33),
-      ));
+    if (null != _recommendDayRes) {
+      _recommendDayRes.category.forEach((category) {
+        retList.add(
+            buildCategoryWidget(category, _recommendDayRes.results[category]));
+      });
     }
     return retList;
+  }
+
+  Widget buildCategoryWidget(String category, List<GankInfo> gankInfoList) {
+    var contentList = <Widget>[];
+    contentList.add(Container(
+      margin: EdgeInsets.only(top: 27, left: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            category,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 19,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 7, right: 10),
+            child: Divider(
+              color: Colors.black,
+              height: 2,
+            ),
+          ),
+        ],
+      ),
+    ));
+
+    gankInfoList.forEach((gankInfo) {
+      contentList.add(Container(
+        margin: EdgeInsets.only(top: 13),
+        padding: EdgeInsets.only(left: 15, right: 10),
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => WebViewPage(gankInfo),
+              ),
+            );
+          },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '•',
+                style: TextStyle(
+                  fontSize: 17,
+                  color: Color(0xff333333),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(left: 10, right: 15),
+                  child: Text(
+                    gankInfo.desc,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xff333333),
+                    ),
+                  ),
+                ),
+              ),
+              Text(
+                gankInfo.who,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xff999999),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ));
+    });
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: contentList,
+    );
   }
 
   @override
