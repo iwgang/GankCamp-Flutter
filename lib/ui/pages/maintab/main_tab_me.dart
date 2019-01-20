@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
+import 'package:gankcamp_flutter/ui/pages/about_page.dart';
 
 class MainTabMe extends StatelessWidget {
   Widget _genItemWidget(
@@ -49,7 +50,13 @@ class MainTabMe extends StatelessWidget {
             child: _genItemWidget(Icons.collections, '收藏', () => print('收藏')),
           ),
           _genItemWidget(Icons.arrow_upward, '提交干货', () => print('提交干货')),
-          _genItemWidget(Icons.person, '关于', () => print('关于')),
+          _genItemWidget(Icons.person, '关于', () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AboutPage(),
+              ),
+            );
+          }),
         ],
       ),
     );
