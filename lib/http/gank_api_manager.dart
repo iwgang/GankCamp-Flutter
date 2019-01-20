@@ -23,10 +23,10 @@ class GankApiManager {
     return null;
   }
 
-  static Future<List<GankInfo>> gankList(
-      String type, int pageNo, int pageSize) async {
+  static Future<List<GankInfo>> gankList(String type, int pageNo,
+      int pageSize) async {
     Map<String, dynamic> res =
-        await get('${_BASE_URL}data/$type/$pageSize/$pageNo');
+    await get('${_BASE_URL}data/$type/$pageSize/$pageNo');
     if (null != res) {
       var gankListRes = GankListRes.fromJson(res);
       if (null != gankListRes && !gankListRes.error) {
@@ -51,5 +51,23 @@ class GankApiManager {
       }
     }
     return null;
+  }
+
+  static Future<bool> pushGank(String title, String who, String url,
+      String type) async {
+    FormData formData = new FormData.from({
+    'desc': title,
+    'who': who,
+    'url': url,
+    'type': type,
+    'debug': 'true',
+    });
+    final response = await dio.post('${_BASE_URL}add2gank', data: formData);
+    print('response.statusCode = ${response.statusCode}');
+    if (response.statusCode == 200) {
+      print('response.data = ${response.data}');
+      return true;
+    }
+    return false;
   }
 }
