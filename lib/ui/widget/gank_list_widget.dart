@@ -84,10 +84,10 @@ class _GankListWidgetState extends State<GankListWidget>
                     child: _ItemView(_gankInfoList[index]),
                     onTap: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              WebViewPage(_gankInfoList[index]),
-                        ),
+                        MaterialPageRoute(builder: (context) {
+                          final curInfo = _gankInfoList[index];
+                          return WebViewPage(curInfo.desc, curInfo.url);
+                        }),
                       );
                     },
                   ),

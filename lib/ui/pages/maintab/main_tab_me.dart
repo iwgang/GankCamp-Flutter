@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
 import 'package:gankcamp_flutter/ui/pages/about_page.dart';
 import 'package:gankcamp_flutter/ui/pages/push_gank_page.dart';
+import 'package:gankcamp_flutter/ui/pages/collection_page.dart';
 
 class MainTabMe extends StatelessWidget {
   Widget _genItemWidget(
@@ -48,7 +49,13 @@ class MainTabMe extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.only(top: 15),
-            child: _genItemWidget(Icons.collections, '收藏', () => print('收藏')),
+            child: _genItemWidget(Icons.collections, '我的收藏', () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CollectionPage(),
+                ),
+              );
+            }),
           ),
           _genItemWidget(Icons.arrow_upward, '提交干货', () {
             Navigator.of(context).push(

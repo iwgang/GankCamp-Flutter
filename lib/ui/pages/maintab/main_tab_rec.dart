@@ -170,7 +170,7 @@ class _MainTabState extends State<MainTabRecWidget>
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => WebViewPage(gankInfo),
+                builder: (context) => WebViewPage(gankInfo.desc, gankInfo.url),
               ),
             );
           },

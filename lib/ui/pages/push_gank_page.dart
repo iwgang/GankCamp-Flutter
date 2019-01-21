@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
 import 'package:gankcamp_flutter/http/gank_api_manager.dart';
-import 'dart:async';
 
 class PushGankPage extends StatefulWidget {
   @override
@@ -34,6 +33,25 @@ class _PushGankPageState extends State<PushGankPage> {
   }
 
   void _checkAndPushGank() {
+    final title = _titleController.text;
+    final who = _whoController.text;
+    final url = _urlController.text;
+
+    if (title.length == 0) {
+      Fluttertoast.showToast(msg: '请输入标题');
+      return;
+    }
+
+    if (who.length == 0) {
+      Fluttertoast.showToast(msg: '请输入提交者');
+      return;
+    }
+
+    if (url.length == 0) {
+      Fluttertoast.showToast(msg: '请输入url');
+      return;
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -41,43 +59,24 @@ class _PushGankPageState extends State<PushGankPage> {
         child: CircularProgressIndicator(),
       ),
     );
-
-    final title = _titleController.text;
-    final who = _whoController.text;
-    final url = _urlController.text;
-
-    if (title.length == 0) {
-      Fluttertoast.showToast(msg: '请输入标题');
-      Timer(Duration(seconds: 3), () {
-        Navigator.of(context).pop();
-      });
-      return;
-    }
-
-    if (who.length == 0) {
-      Fluttertoast.showToast(msg: '请输入提交者');
-      Navigator.of(context).pop();
-      return;
-    }
-
-    if (url.length == 0) {
-      Fluttertoast.showToast(msg: '请输入url');
-      Navigator.of(context).pop();
-      return;
-    }
-
-    Navigator.of(context).pop();
-    Fluttertoast.showToast(msg: '提交成功');
-    _titleController.clear();
-    _whoController.clear();
-    _urlController.clear();
-
-//    _pushGank(title, who, url, _selType);
+    _pushGank(title, who, url, _selType);
   }
 
   void _pushGank(String title, String who, String url, String type) async {
-    bool isSucess = await GankApiManager.pushGank(title, who, url, type);
-    print('isSucess = $isSucess');
+    final res = await GankApiManager.pushGank(title, who, url, type);
+    Navigator.of(context).pop();
+    if (null != res) {
+      if (res.error) {
+        Fluttertoast.showToast(msg: res.msg ?? '提交失败，请重试');
+      } else {
+        Fluttertoast.showToast(msg: '提交成功');
+        _titleController.clear();
+        _whoController.clear();
+        _urlController.clear();
+      }
+    } else {
+      Fluttertoast.showToast(msg: '提交失败，请重试');
+    }
   }
 
   @override
