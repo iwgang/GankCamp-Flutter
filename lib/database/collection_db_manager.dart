@@ -58,7 +58,7 @@ class CollectionDBManager {
   Future<List<CollectionInfo>> list() async {
     var dbClient = await db;
     List<Map<String, dynamic>> result =
-        await dbClient.query(_TABLE_NAME);
+        await dbClient.query(_TABLE_NAME, orderBy: '$COLUMN_ID desc');
     List<CollectionInfo> retCollectionInfo;
     if (null != result && result.isNotEmpty) {
       retCollectionInfo = [];
