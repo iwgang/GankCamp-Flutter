@@ -58,7 +58,7 @@ class _WebViewPageState extends State<WebViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title, style: TextStyle(fontSize: 14), maxLines: 2,),
         backgroundColor: AppColors.MAIN_COLOR,
         elevation: 2,
         actions: <Widget>[
