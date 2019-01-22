@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gankcamp_flutter/ui/pages/splash_page.dart';
 

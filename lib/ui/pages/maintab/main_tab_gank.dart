@@ -12,6 +12,7 @@ class MainTabGankWidget extends StatefulWidget {
 class _MainTabGankWidgetState extends State<MainTabGankWidget> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return DefaultTabController(
         length: _allTabs.length,
         child: Scaffold(

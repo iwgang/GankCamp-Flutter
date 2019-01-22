@@ -60,6 +60,7 @@ class _MainTabState extends State<MainTabRecWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Stack(
       children: <Widget>[
         Offstage(

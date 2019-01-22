@@ -60,7 +60,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          Timer(Duration(seconds: 2), () {
+          Future.delayed(Duration(seconds: 2), () {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

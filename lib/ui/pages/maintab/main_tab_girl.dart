@@ -63,6 +63,7 @@ class _MainTabGirlState extends State<MainTabGirlWidget>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final Orientation orientation = MediaQuery.of(context).orientation;
     return Scaffold(
       appBar: AppBar(

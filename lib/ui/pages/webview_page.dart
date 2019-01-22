@@ -58,7 +58,11 @@ class _WebViewPageState extends State<WebViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(fontSize: 14), maxLines: 2,),
+        title: Text(
+          widget.title,
+          style: TextStyle(fontSize: 14),
+          maxLines: 2,
+        ),
         backgroundColor: AppColors.MAIN_COLOR,
         elevation: 2,
         actions: <Widget>[
@@ -109,7 +113,7 @@ class _WebViewPageState extends State<WebViewPage> {
             initialUrl: widget.url,
             onWebViewCreated: (_) {
               // 由于没找到获取页面加载完成的回调，只能给个固定加载时间
-              Timer(Duration(seconds: 2), () {
+              Future.delayed(Duration(seconds: 2), () {
                 setState(() {
                   _isHideLoading = true;
                 });

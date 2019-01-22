@@ -5,6 +5,7 @@ import 'package:gankcamp_flutter/ui/pages/maintab/main_tab_gank.dart';
 import 'package:gankcamp_flutter/ui/pages/maintab/main_tab_girl.dart';
 import 'package:gankcamp_flutter/ui/pages/maintab/main_tab_me.dart';
 import 'package:gankcamp_flutter/ui/pages/maintab/main_tab_rec.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomeWidgetState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int _tabIndex = 0;
+  int _lastBackMillisecond = 0;
   var _tabPageController = PageController();
 
   @override
@@ -54,20 +56,33 @@ class _HomeWidgetState extends State<HomePage>
     );
   }
 
+  Future<bool> _onBack() {
+    final curBackMillisecond = DateTime.now().millisecondsSinceEpoch;
+    if (curBackMillisecond - _lastBackMillisecond > 2000) {
+      _lastBackMillisecond = curBackMillisecond;
+      Fluttertoast.showToast(msg: '再按一次退出APP');
+      return Future.value(false);
+    }
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        physics: NeverScrollableScrollPhysics(),
-        controller: _tabPageController,
-        children: <Widget>[
-          MainTabGankWidget(),
-          MainTabRecWidget(),
-          MainTabGirlWidget(),
-          MainTabMe(),
-        ],
+    return WillPopScope(
+      onWillPop: _onBack,
+      child: Scaffold(
+        body: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: _tabPageController,
+          children: <Widget>[
+            MainTabGankWidget(),
+            MainTabRecWidget(),
+            MainTabGirlWidget(),
+            MainTabMe(),
+          ],
+        ),
+        bottomNavigationBar: _bottomNavigationBar(),
       ),
-      bottomNavigationBar: _bottomNavigationBar(),
     );
   }
 }
