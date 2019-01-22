@@ -13,6 +13,9 @@ class GankApiManager {
   static Future<Map<String, dynamic>> get(String url) async {
     try {
       print('>>> get url = $url');
+      dio.onHttpClientCreate = (http) {
+        http.badCertificateCallback = (cert, host, port) => true;
+      };
       final response = await dio.get(url);
       if (response.statusCode == 200) {
         return response.data;

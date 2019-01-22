@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
@@ -5,8 +6,6 @@ import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
 import 'package:gankcamp_flutter/ui/pages/show_picture_page.dart';
 import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
-import "package:pull_to_refresh/pull_to_refresh.dart";
-import 'package:cached_network_image/cached_network_image.dart';
 
 class MainTabGirlWidget extends StatefulWidget {
   @override
@@ -16,14 +15,20 @@ class MainTabGirlWidget extends StatefulWidget {
 class _MainTabGirlState extends State<MainTabGirlWidget>
     with AutomaticKeepAliveClientMixin {
   List<GankInfo> _gankInfoList;
-  RefreshController _refreshController;
   int _pageNo = 1;
   bool _isLoading = true;
+  ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _refreshController = RefreshController();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          _onLoadMore();
+        }
+      });
     _girlList(() {
       setState(() {
         _isLoading = false;
@@ -47,17 +52,25 @@ class _MainTabGirlState extends State<MainTabGirlWidget>
     }
   }
 
-  Future _onListViewLoadData(bool up) async {
-    if (up) {
-      // 下拉刷新
-      _pageNo = 1;
-      await _girlList(
-          () => _refreshController.sendBack(true, RefreshStatus.completed));
+  Future<Null> _onRefresh() async {
+    _pageNo = 1;
+    await _girlList();
+  }
+
+  Future _onLoadMore() async {
+    _pageNo++;
+    await _girlList();
+  }
+
+  int _itemCount() => _gankInfoList != null && _gankInfoList.isNotEmpty
+      ? _gankInfoList.length + 1
+      : 0;
+
+  Widget _itemView(context, index) {
+    if (_gankInfoList.length > 0 && index == _gankInfoList.length) {
+      return RefreshCommonWidget.commonLoadMoreWidget();
     } else {
-      // 加载更多
-      _pageNo++;
-      await _girlList(
-          () => _refreshController.sendBack(false, RefreshStatus.idle));
+      return _ItemView(_gankInfoList[index]);
     }
   }
 
@@ -75,24 +88,24 @@ class _MainTabGirlState extends State<MainTabGirlWidget>
         children: <Widget>[
           Offstage(
             offstage: _isLoading,
-            child: SmartRefresher(
-              enablePullUp: true,
-              controller: _refreshController,
-              onRefresh: _onListViewLoadData,
-              headerBuilder: RefreshCommonWidget.commonHeaderBuilder,
-              footerBuilder: RefreshCommonWidget.commonFooterBuilder,
-              child: GridView.count(
-                crossAxisCount: (orientation == Orientation.portrait) ? 2 : 3,
-                mainAxisSpacing: 4,
-                crossAxisSpacing: 4,
-                padding: const EdgeInsets.all(4),
-                childAspectRatio:
-                    (orientation == Orientation.portrait) ? 0.8 : 0.9,
-                children: null != _gankInfoList
-                    ? _gankInfoList
-                        .map<Widget>((info) => _ItemView(info))
-                        .toList()
-                    : <Widget>[],
+            child: RefreshIndicator(
+              color: AppColors.MAIN_COLOR,
+              onRefresh: _onRefresh,
+              child: Scrollbar(
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount:
+                        (orientation == Orientation.portrait) ? 2 : 3,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                    childAspectRatio:
+                        (orientation == Orientation.portrait) ? 0.8 : 0.9,
+                  ),
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(4),
+                  itemCount: _itemCount(),
+                  itemBuilder: _itemView,
+                ),
               ),
             ),
           ),

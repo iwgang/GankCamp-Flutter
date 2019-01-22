@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:gankcamp_flutter/constant/app_colors.dart';
+import 'package:gankcamp_flutter/constant/common_utils.dart';
 import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
-import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
-import 'package:gankcamp_flutter/constant/common_utils.dart';
-import 'package:gankcamp_flutter/constant/app_colors.dart';
-import "package:pull_to_refresh/pull_to_refresh.dart";
 import 'package:gankcamp_flutter/ui/pages/webview_page.dart';
+import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
 
 class GankListWidget extends StatefulWidget {
   final String type;
@@ -21,13 +20,19 @@ class _GankListWidgetState extends State<GankListWidget>
     with AutomaticKeepAliveClientMixin {
   List<GankInfo> _gankInfoList;
   int _pageNo = 1;
-  RefreshController _refreshController;
   bool _isLoading = true;
+  ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _refreshController = RefreshController();
+    _scrollController = ScrollController()
+      ..addListener(() {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          _onLoadMore();
+        }
+      });
     _gankList(() {
       setState(() {
         _isLoading = false;
@@ -52,17 +57,35 @@ class _GankListWidgetState extends State<GankListWidget>
     }
   }
 
-  Future _onListViewLoadData(bool up) async {
-    if (up) {
-      // 下拉刷新
-      _pageNo = 1;
-      await _gankList(
-          () => _refreshController.sendBack(true, RefreshStatus.completed));
+  Future<Null> _onRefresh() async {
+    _pageNo = 1;
+    await _gankList();
+  }
+
+  Future _onLoadMore() async {
+    _pageNo++;
+    await _gankList();
+  }
+
+  int _itemCount() => _gankInfoList != null && _gankInfoList.isNotEmpty
+      ? _gankInfoList.length + 1
+      : 0;
+
+  Widget _itemView(context, index) {
+    if (_gankInfoList.length > 0 && index == _gankInfoList.length) {
+      return RefreshCommonWidget.commonLoadMoreWidget();
     } else {
-      // 加载更多
-      _pageNo++;
-      await _gankList(
-          () => _refreshController.sendBack(false, RefreshStatus.idle));
+      return InkWell(
+        child: _ItemView(_gankInfoList[index]),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) {
+              final curInfo = _gankInfoList[index];
+              return WebViewPage(curInfo.desc, curInfo.url);
+            }),
+          );
+        },
+      );
     }
   }
 
@@ -72,25 +95,15 @@ class _GankListWidgetState extends State<GankListWidget>
       children: <Widget>[
         Offstage(
           offstage: _isLoading,
-          child: SmartRefresher(
-            enablePullUp: true,
-            controller: _refreshController,
-            onRefresh: _onListViewLoadData,
-            headerBuilder: RefreshCommonWidget.commonHeaderBuilder,
-            footerBuilder: RefreshCommonWidget.commonFooterBuilder,
-            child: ListView.builder(
-              itemCount: _gankInfoList?.length ?? 0,
-              itemBuilder: (context, index) => InkWell(
-                    child: _ItemView(_gankInfoList[index]),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) {
-                          final curInfo = _gankInfoList[index];
-                          return WebViewPage(curInfo.desc, curInfo.url);
-                        }),
-                      );
-                    },
-                  ),
+          child: RefreshIndicator(
+            color: AppColors.MAIN_COLOR,
+            onRefresh: _onRefresh,
+            child: Scrollbar(
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _itemCount(),
+                itemBuilder: _itemView,
+              ),
             ),
           ),
         ),
