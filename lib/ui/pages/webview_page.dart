@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -31,6 +30,7 @@ class _WebViewPageState extends State<WebViewPage> {
   CollectionInfo _collectionInfo;
   CollectionDBManager _collectionDBManager;
   CollectionStateChange _collectionStateChange;
+  Timer _loadingTimer;
 
   @override
   void initState() {
@@ -72,6 +72,12 @@ class _WebViewPageState extends State<WebViewPage> {
   Future<bool> _onBack() {
     Navigator.of(context).pop(_collectionStateChange);
     return Future.value(false);
+  }
+
+  @override
+  void dispose() {
+    _loadingTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -138,7 +144,7 @@ class _WebViewPageState extends State<WebViewPage> {
               initialUrl: widget.url,
               onWebViewCreated: (_) {
                 // 由于没找到获取页面加载完成的回调，只能给个固定加载时间
-                Future.delayed(Duration(seconds: 2), () {
+                _loadingTimer = Timer(Duration(seconds: 2), () {
                   setState(() {
                     _isHideLoading = true;
                   });
