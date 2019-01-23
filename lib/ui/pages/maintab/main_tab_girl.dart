@@ -6,6 +6,7 @@ import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
 import 'package:gankcamp_flutter/ui/pages/show_picture_page.dart';
 import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MainTabGirlWidget extends StatefulWidget {
   @override
@@ -62,22 +63,30 @@ class _MainTabGirlState extends State<MainTabGirlWidget>
     await _girlList();
   }
 
-  int _itemCount() => _gankInfoList != null && _gankInfoList.isNotEmpty
-      ? _gankInfoList.length + 1
-      : 0;
-
-  Widget _itemView(context, index) {
-    if (_gankInfoList.length > 0 && index == _gankInfoList.length) {
-      return RefreshCommonWidget.commonLoadMoreWidget();
-    } else {
-      return _ItemView(_gankInfoList[index]);
-    }
+  List<Widget> _buildItem(BuildContext context) {
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    var slivers = GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: (orientation == Orientation.portrait) ? 2 : 3,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+        childAspectRatio: (orientation == Orientation.portrait) ? 0.8 : 0.9,
+      ),
+      padding: const EdgeInsets.all(4),
+      itemCount: _itemCount(),
+      itemBuilder: (context, index) => _ItemView(_gankInfoList[index]),
+    ).buildSlivers(context);
+    slivers.add(SliverToBoxAdapter(
+      child: RefreshCommonWidget.commonLoadMoreWidget(),
+    ));
+    return slivers;
   }
+
+  int _itemCount() => _gankInfoList?.length ?? 0;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final Orientation orientation = MediaQuery.of(context).orientation;
     return Scaffold(
       appBar: AppBar(
         title: Text('妹纸'),
@@ -92,19 +101,9 @@ class _MainTabGirlState extends State<MainTabGirlWidget>
               color: AppColors.MAIN_COLOR,
               onRefresh: _onRefresh,
               child: Scrollbar(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:
-                        (orientation == Orientation.portrait) ? 2 : 3,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    childAspectRatio:
-                        (orientation == Orientation.portrait) ? 0.8 : 0.9,
-                  ),
+                child: CustomScrollView(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(4),
-                  itemCount: _itemCount(),
-                  itemBuilder: _itemView,
+                  slivers: _buildItem(context),
                 ),
               ),
             ),
