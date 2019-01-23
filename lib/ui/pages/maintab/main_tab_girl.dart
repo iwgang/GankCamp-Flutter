@@ -6,7 +6,6 @@ import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
 import 'package:gankcamp_flutter/ui/pages/show_picture_page.dart';
 import 'package:gankcamp_flutter/ui/widget/refresh_common_widget.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MainTabGirlWidget extends StatefulWidget {
   @override
