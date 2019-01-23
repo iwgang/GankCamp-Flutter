@@ -73,6 +73,16 @@ class CollectionDBManager {
         .delete(_TABLE_NAME, where: '$COLUMN_ID = ?', whereArgs: [id]);
   }
 
+  Future<CollectionInfo> getCollectionByID(int id) async {
+    var dbClient = await db;
+    List<Map<String, dynamic>> result = await dbClient
+        .query(_TABLE_NAME, where: '$COLUMN_ID = ?', whereArgs: [id]);
+    if (null != result && result.isNotEmpty) {
+      return CollectionInfo.fromMap(result.first);
+    }
+    return null;
+  }
+
   Future<CollectionInfo> getCollectionByTitleAndUrl(
       String title, String url) async {
     var dbClient = await db;

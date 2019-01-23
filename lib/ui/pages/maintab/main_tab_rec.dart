@@ -5,6 +5,7 @@ import 'package:gankcamp_flutter/constant/app_colors.dart';
 import 'package:gankcamp_flutter/http/gank_api_manager.dart';
 import 'package:gankcamp_flutter/http/response/recommend_day_res.dart';
 import 'package:gankcamp_flutter/model/gank_info.dart';
+import 'package:gankcamp_flutter/ui/pages/show_picture_page.dart';
 import 'package:gankcamp_flutter/ui/pages/webview_page.dart';
 import 'package:gankcamp_flutter/ui/widget/select_rec_date_widget.dart';
 
@@ -51,6 +52,7 @@ class _MainTabState extends State<MainTabRecWidget>
         res.results.remove(welfareKey);
         res.category.remove(welfareKey);
       }
+      res.category.sort((a, b) => a.compareTo(b));
       setState(() {
         _recommendDayRes = res;
         _isLoading = false;
@@ -93,10 +95,33 @@ class _MainTabState extends State<MainTabRecWidget>
                 flexibleSpace: null == _bannerUrl
                     ? null
                     : FlexibleSpaceBar(
-                        background: CachedNetworkImage(
-                          imageUrl: _bannerUrl,
-                          fit: BoxFit.cover,
-                          height: _appBarHeight,
+                        background: Stack(
+                          children: <Widget>[
+                            Positioned.fill(
+                              child: CachedNetworkImage(
+                                imageUrl: _bannerUrl,
+                                fit: BoxFit.cover,
+                                height: _appBarHeight,
+                              ),
+                            ),
+                            Positioned.fill(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  highlightColor: Color(0x15000000),
+                                  splashColor: Color(0x103f3f3f),
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ShowPicturePage(_bannerUrl),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
               ),
@@ -134,6 +159,7 @@ class _MainTabState extends State<MainTabRecWidget>
             buildCategoryWidget(category, _recommendDayRes.results[category]));
       });
     }
+    retList.add(SizedBox(height: 30));
     return retList;
   }
 

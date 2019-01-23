@@ -165,6 +165,8 @@ class _ItemView extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
+              highlightColor: Color(0x20000000),
+              splashColor: Color(0x103f3f3f),
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -174,7 +176,7 @@ class _ItemView extends StatelessWidget {
               },
             ),
           ),
-        )
+        ),
       ],
     );
   }

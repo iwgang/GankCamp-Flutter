@@ -4,6 +4,7 @@ import 'package:gankcamp_flutter/constant/app_colors.dart';
 import 'package:gankcamp_flutter/constant/common_utils.dart';
 import 'package:gankcamp_flutter/database/collection_db_manager.dart';
 import 'package:gankcamp_flutter/model/collection_info.dart';
+import 'package:gankcamp_flutter/model/collection_state_change.dart';
 import 'package:gankcamp_flutter/ui/pages/webview_page.dart';
 
 class CollectionPage extends StatefulWidget {
@@ -12,7 +13,7 @@ class CollectionPage extends StatefulWidget {
 }
 
 class _CollectionPageState extends State<CollectionPage> {
-  List<CollectionInfo> _collectionInfo;
+  List<CollectionInfo> _collectionInfoList;
   CollectionDBManager _collectionDBManager;
   bool _isLoading = true;
 
@@ -32,8 +33,62 @@ class _CollectionPageState extends State<CollectionPage> {
     if (null != loadEndCallback) loadEndCallback();
     if (null != res && res.isNotEmpty) {
       setState(() {
-        _collectionInfo = res;
+        _collectionInfoList = res;
       });
+    }
+  }
+
+  void _itemLongClick(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            content: Text('确定删除该条收藏吗？'),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  '取消',
+                  style: TextStyle(color: Color(0xff999999)),
+                ),
+              ),
+              FlatButton(
+                onPressed: () async {
+                  Navigator.of(context).pop(true);
+                  await _collectionDBManager
+                      .remove(_collectionInfoList[index].id);
+                  setState(() {
+                    _collectionInfoList.removeAt(index);
+                  });
+                },
+                child: Text(
+                  '确定',
+                  style: TextStyle(color: AppColors.MAIN_COLOR),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _onWebViewPageResult(dynamic result) async {
+    if (null != result &&
+        result is CollectionStateChange &&
+        result.id > 0 &&
+        !result.isCollection) {
+      int curIndex = -1;
+      for (int i = 0; i < _collectionInfoList.length; i++) {
+        if (_collectionInfoList[i].id == result.id) {
+          curIndex = i;
+          break;
+        }
+      }
+
+      if (curIndex != -1) {
+        await _collectionDBManager.remove(_collectionInfoList[curIndex].id);
+        setState(() {
+          _collectionInfoList.removeAt(curIndex);
+        });
+      }
     }
   }
 
@@ -50,16 +105,21 @@ class _CollectionPageState extends State<CollectionPage> {
           Offstage(
             offstage: _isLoading,
             child: ListView.builder(
-              itemCount: _collectionInfo?.length ?? 0,
+              itemCount: _collectionInfoList?.length ?? 0,
               itemBuilder: (context, index) => InkWell(
-                    child: _ItemView(_collectionInfo[index]),
+                    child: _ItemView(_collectionInfoList[index]),
+                    onLongPress: () => _itemLongClick(index),
                     onTap: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (context) {
-                          final curInfo = _collectionInfo[index];
-                          return WebViewPage(curInfo.title, curInfo.url);
+                          final curInfo = _collectionInfoList[index];
+                          return WebViewPage(
+                            curInfo.title,
+                            curInfo.url,
+                            collectionId: curInfo.id,
+                          );
                         }),
-                      );
+                      ).then(_onWebViewPageResult);
                     },
                   ),
             ),
