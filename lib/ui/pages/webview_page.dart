@@ -1,13 +1,14 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gankcamp_flutter/constant/app_colors.dart';
 import 'package:gankcamp_flutter/database/collection_db_manager.dart';
 import 'package:gankcamp_flutter/model/collection_info.dart';
 import 'package:gankcamp_flutter/model/collection_state_change.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
-import 'package:webview_flutter/webview_flutter.dart';
 
 enum PopupMenuOpTypeEnum {
   COPY_URL,
@@ -26,11 +27,9 @@ class WebViewPage extends StatefulWidget {
 }
 
 class _WebViewPageState extends State<WebViewPage> {
-  bool _isHideLoading = false;
   CollectionInfo _collectionInfo;
   CollectionDBManager _collectionDBManager;
   CollectionStateChange _collectionStateChange;
-  Timer _loadingTimer;
 
   @override
   void initState() {
@@ -75,16 +74,11 @@ class _WebViewPageState extends State<WebViewPage> {
   }
 
   @override
-  void dispose() {
-    _loadingTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onBack,
-      child: Scaffold(
+      child: WebviewScaffold(
+        url: widget.url,
         appBar: AppBar(
           title: Text(
             widget.title,
@@ -137,28 +131,16 @@ class _WebViewPageState extends State<WebViewPage> {
             ),
           ],
         ),
-        body: Stack(
-          children: <Widget>[
-            WebView(
-              javascriptMode: JavascriptMode.unrestricted,
-              initialUrl: widget.url,
-              onWebViewCreated: (_) {
-                // 由于没找到获取页面加载完成的回调，只能给个固定加载时间
-                _loadingTimer = Timer(Duration(seconds: 2), () {
-                  setState(() {
-                    _isHideLoading = true;
-                  });
-                });
-              },
+        withZoom: true,
+        withLocalStorage: true,
+        hidden: true,
+        initialChild: Container(
+          color: Colors.white,
+          child: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.MAIN_COLOR),
             ),
-            Offstage(
-              offstage: _isHideLoading,
-              child: SizedBox(
-                height: 3,
-                child: LinearProgressIndicator(),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
